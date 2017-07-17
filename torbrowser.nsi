@@ -1,4 +1,4 @@
-;NSIS Installer for Tor Browser Bundle
+;NSIS Installer for JonDoBrowser Bundle
 ;Written by Moritz Bartl
 ;released under Public Domain
 
@@ -10,33 +10,33 @@
 ;--------------------------------
 ;General
  
-  ; location of Tor Browser bundle to put into installer
-  !define TBBSOURCE ".\Tor Browser\"  
+  ; location of JonDoBrowser bundle to put into installer
+  !define TBBSOURCE ".\JonDoBrowser\"  
 
-  Name "Tor Browser"
+  Name "JonDoBrowser"
   OutFile "torbrowser-install.exe"
 
   ;Default installation folder
-  InstallDir "$DESKTOP\Tor Browser"
+  InstallDir "$DESKTOP\JonDoBrowser"
   
   ;Best (but slowest) compression
   SetCompressor /SOLID lzma
   SetCompressorDictSize 32
 
   ;Request application privileges for Windows Vista
-  RequestExecutionLevel user
+  RequestExecutionLevel admin
 
 ;--------------------------------
 ;Interface Configuration
 
-  !define MUI_ICON   "torbrowser.ico"
+  !define MUI_ICON   "jondobrowser.ico"
   !define MUI_ABORTWARNING
 
 ;--------------------------------
 ;Modern UI settings
   !define MUI_FINISHPAGE_NOREBOOTSUPPORT     ; we don't require a reboot
   !define MUI_FINISHPAGE_RUN
-  !define MUI_FINISHPAGE_RUN_FUNCTION "StartTorBrowser"
+  !define MUI_FINISHPAGE_RUN_FUNCTION "StartJonDoBrowser"
   !define MUI_FINISHPAGE_SHOWREADME ; misuse for option to create shortcut; less ugly than MUI_PAGE_COMPONENTS
   !define MUI_FINISHPAGE_SHOWREADME_TEXT "&Add Start Menu && Desktop shortcuts"
   !define MUI_FINISHPAGE_SHOWREADME_FUNCTION "CreateShortCuts"
@@ -125,19 +125,145 @@
 ;--------------------------------
 ;Installer Sections
 
-Section "Tor Browser Bundle" SecTBB
+Section "JonDoBrowser Bundle" SecTBB
 
   SetOutPath "$INSTDIR"
   File /r "${TBBSOURCE}\*.*"
   SetOutPath "$INSTDIR\Browser"
-  CreateShortCut "$INSTDIR\Start Tor Browser.lnk" "$INSTDIR\Browser\firefox.exe"
+  CreateShortCut "$INSTDIR\Start JonDoBrowser.lnk" "$INSTDIR\Browser\firefox.exe"
 
+SectionEnd
+
+Function VersionCompare
+  !define VersionCompare `!insertmacro VersionCompareCall`
+  !macro VersionCompareCall _VER1 _VER2 _RESULT
+    Push `${_VER1}`
+    Push `${_VER2}`
+    Call VersionCompare
+    Pop ${_RESULT}
+  !macroend
+  Exch $1
+  Exch
+  Exch $0
+  Exch
+  Push $2
+  Push $3
+  Push $4
+  Push $5
+  Push $6
+  Push $7
+  begin:
+  StrCpy $2 -1
+  IntOp $2 $2 + 1
+  StrCpy $3 $0 1 $2
+  StrCmp $3 '' +2
+  StrCmp $3 '.' 0 -3
+  StrCpy $4 $0 $2
+  IntOp $2 $2 + 1
+  StrCpy $0 $0 '' $2
+  StrCpy $2 -1
+  IntOp $2 $2 + 1
+  StrCpy $3 $1 1 $2
+  StrCmp $3 '' +2
+  StrCmp $3 '.' 0 -3
+  StrCpy $5 $1 $2
+  IntOp $2 $2 + 1
+  StrCpy $1 $1 '' $2
+  StrCmp $4$5 '' equal
+  StrCpy $6 -1
+  IntOp $6 $6 + 1
+  StrCpy $3 $4 1 $6
+  StrCmp $3 '0' -2
+  StrCmp $3 '' 0 +2
+  StrCpy $4 0
+  StrCpy $7 -1
+  IntOp $7 $7 + 1
+  StrCpy $3 $5 1 $7
+  StrCmp $3 '0' -2
+  StrCmp $3 '' 0 +2
+  StrCpy $5 0
+  StrCmp $4 0 0 +2
+  StrCmp $5 0 begin newer2
+  StrCmp $5 0 newer1
+  IntCmp $6 $7 0 newer1 newer2
+  StrCpy $4 '1$4'
+  StrCpy $5 '1$5'
+  IntCmp $4 $5 begin newer2 newer1
+  equal:
+  StrCpy $0 0
+  goto end
+  newer1:
+  StrCpy $0 1
+  goto end
+  newer2:
+  StrCpy $0 2
+  end:
+  Pop $7
+  Pop $6
+  Pop $5
+  Pop $4
+  Pop $3
+  Pop $2
+  Pop $1
+  Exch $0
+FunctionEnd
+Section "Install Java SE Runtime Environment" INSTALLJAVA
+  Var /GLOBAL JRE_REG_DIR
+  Var /GLOBAL JRE_CUR_VERSION
+  Var /GLOBAL JRE_HOME_DIR
+  Var /GLOBAL JRE_CHK_VERSION
+  ; check 32-bit JRE
+  SetRegView 32
+  StrCpy $JRE_REG_DIR "SOFTWARE\Wow6432Node\JavaSoft\Java Runtime Environment"
+  StrCpy $JRE_CUR_VERSION 0
+  ReadRegStr $JRE_CUR_VERSION HKLM "$JRE_REG_DIR" "CurrentVersion"
+  StrCmp $JRE_CUR_VERSION "" DetectJRE64
+  ReadRegStr $JRE_HOME_DIR HKLM "$JRE_REG_DIR\$JRE_CUR_VERSION" "JavaHome"
+  StrCmp $JRE_HOME_DIR "" DetectJRE64
+  Goto JREVersionCompare
+  ; check 64-bit JRE
+  DetectJRE64:
+  SetRegView 64
+  StrCpy $JRE_REG_DIR "SOFTWARE\JavaSoft\Java Runtime Environment"
+  StrCpy $JRE_CUR_VERSION 0
+  ReadRegStr $JRE_CUR_VERSION HKLM "$JRE_REG_DIR" "CurrentVersion"
+  StrCmp $JRE_CUR_VERSION "" DetectJDK32
+  ReadRegStr $JRE_HOME_DIR HKLM "$JRE_REG_DIR\$JRE_CUR_VERSION" "JavaHome"
+  StrCmp $JRE_HOME_DIR "" DetectJDK32
+  Goto JREVersionCompare
+  DetectJDK32:
+  SetRegView 32
+  ReadRegStr $JRE_CUR_VERSION HKLM "SOFTWARE\Wow6432Node\JavaSoft\Java Development Kit" "CurrentVersion"
+  StrCmp $JRE_CUR_VERSION "" DetectJDK64
+  ReadRegStr $JRE_HOME_DIR HKLM "SOFTWARE\Wow6432Node\JavaSoft\Java Development Kit\$JRE_CUR_VERSION" "JavaHome"
+  StrCmp $JRE_HOME_DIR "" DetectJDK64
+  Goto JREVersionCompare
+  DetectJDK64:
+  SetRegView 64
+  ReadRegStr $JRE_CUR_VERSION HKLM "SOFTWARE\JavaSoft\Java Development Kit" "CurrentVersion"
+  StrCmp $JRE_CUR_VERSION "" NoJava
+  ReadRegStr $JRE_HOME_DIR HKLM "SOFTWARE\JavaSoft\Java Development Kit\$JRE_CUR_VERSION" "JavaHome"
+  StrCmp $JRE_HOME_DIR "" NoJava
+  Goto JREVersionCompare
+  JREVersionCompare:
+    StrCpy $JRE_CHK_VERSION 0
+    ${VersionCompare} "1.8" "$JRE_CUR_VERSION" $JRE_CHK_VERSION
+    ${If} $JRE_CHK_VERSION == "1"
+      Goto NoJava
+    ${Else}
+      RETURN
+    ${EndIf}
+  NoJava:
+    MessageBox MB_OK|MB_ICONINFORMATION "Installer will now install Java SE Runtime Environment"
+    File "${TBBSOURCE}\Browser\JonDo\jre.exe"
+    ExecWait "$INSTDIR\Browser\JonDo\jre.exe"
+    RETURN
 SectionEnd
 
 Function CreateShortcuts
 
-  CreateShortCut "$SMPROGRAMS\Start Tor Browser.lnk" "$INSTDIR\Browser\firefox.exe" 
-  CreateShortCut "$DESKTOP\Start Tor Browser.lnk" "$INSTDIR\Browser\firefox.exe"
+  CreateShortCut "$SMPROGRAMS\Start JonDoBrowser.lnk" "$INSTDIR\Browser\firefox.exe" 
+  CreateShortCut "$DESKTOP\Start JonDoBrowser.lnk" "$INSTDIR\Browser\firefox.exe"
 
 FunctionEnd
 ;--------------------------------
@@ -154,14 +280,14 @@ FunctionEnd
 
 Function CheckIfTargetDirectoryExists
 ${If} ${FileExists} "$INSTDIR\*.*"
- MessageBox MB_YESNO "The destination directory already exists. You can try to upgrade the Tor Browser Bundle, but if you run into any problems, use a new directory instead. Continue?" IDYES NoAbort
+ MessageBox MB_YESNO "The destination directory already exists. You can try to upgrade the JonDoBrowser Bundle, but if you run into any problems, use a new directory instead. Continue?" IDYES NoAbort
    Abort
  NoAbort:
 ${EndIf}
 FunctionEnd
 
 
-Function StartTorBrowser
-ExecShell "open" "$INSTDIR/Start Tor Browser.lnk"
+Function StartJonDoBrowser
+ExecShell "open" "$INSTDIR/Start JonDoBrowser.lnk"
 FunctionEnd
 
