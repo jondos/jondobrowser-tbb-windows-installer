@@ -121,6 +121,14 @@
   ;because this will make your installer start faster.
   
   !insertmacro MUI_RESERVEFILE_LANGDLL
+;--------------------------------
+;Version Information
+  VIProductVersion "Version_To_Be_Replaced"
+  VIAddVersionKey /LANG=${LANG_ENGLISH} "ProductVersion" "Version_To_Be_Replaced"
+  VIAddVersionKey /LANG=${LANG_ENGLISH} "FileDescription" "JonDoBrowser"
+  VIAddVersionKey /LANG=${LANG_ENGLISH} "ProductName" "JonDoBrowser"
+  VIAddVersionKey /LANG=${LANG_ENGLISH} "LegalTrademarks" "JonDoBrowser and the JonDoBrowser logos are trademarks of JonDos GmbH, Germany."
+  VIAddVersionKey /LANG=${LANG_ENGLISH} "CompanyName" "Jondos GmbH"
 
 ;--------------------------------
 ;Installer Sections
