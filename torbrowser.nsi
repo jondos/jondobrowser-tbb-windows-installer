@@ -125,18 +125,12 @@
 ;Version Information
   VIProductVersion "Version_To_Be_Replaced"
   ;English
-  VIAddVersionKey /LANG=${LANG_ENGLISH} "ProductVersion" "Version_To_Be_Replaced"
-  VIAddVersionKey /LANG=${LANG_ENGLISH} "FileDescription" "JonDoBrowser"
-  VIAddVersionKey /LANG=${LANG_ENGLISH} "ProductName" "JonDoBrowser"
-  VIAddVersionKey /LANG=${LANG_ENGLISH} "LegalTrademarks" "JonDoBrowser and the JonDoBrowser logos are trademarks of JonDos GmbH, Germany."
-  VIAddVersionKey /LANG=${LANG_ENGLISH} "CompanyName" "Jondos GmbH"
-  ;German
-  VIAddVersionKey /LANG=${LANG_GERMAN} "ProductVersion" "Version_To_Be_Replaced"
-  VIAddVersionKey /LANG=${LANG_GERMAN} "FileDescription" "JonDoBrowser"
-  VIAddVersionKey /LANG=${LANG_GERMAN} "ProductName" "JonDoBrowser"
-  VIAddVersionKey /LANG=${LANG_GERMAN} "LegalTrademarks" "JonDoBrowser und die JonDoBrowser Logos sind Marken der JonDos GmbH, Deutschland."
-  VIAddVersionKey /LANG=${LANG_GERMAN} "CompanyName" "Jondos GmbH"
-
+  VIAddVersionKey /LANG=${Lang_To_Be_Replaced} "ProductVersion" "Version_To_Be_Replaced"
+  VIAddVersionKey /LANG=${Lang_To_Be_Replaced} "FileDescription" "JonDoBrowser"
+  VIAddVersionKey /LANG=${Lang_To_Be_Replaced} "ProductName" "JonDoBrowser"
+  VIAddVersionKey /LANG=${Lang_To_Be_Replaced} "CompanyName" "Jondos GmbH"
+  VIAddVersionKey /LANG=${Lang_To_Be_Replaced} "LegalTrademarks" "Legal_Notice_To_Be_Replaced"
+  
 ;--------------------------------
 ;Installer Sections
 
