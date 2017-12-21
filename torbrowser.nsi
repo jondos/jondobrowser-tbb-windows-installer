@@ -2,10 +2,20 @@
 ;Written by Moritz Bartl
 ;released under Public Domain
 
+!addincludedir  ".\StdUtils\Include"
+!ifdef NSIS_UNICODE
+  !addplugindir ".\StdUtils\Plugins\Unicode"
+!else
+  !addplugindir ".\StdUtils\Plugins\ANSI"
+!endif
+
 ;--------------------------------
 ;Modern" UI
-
   !include "MUI2.nsh"
+
+;--------------------------------
+;StdUtils
+  !include 'StdUtils.nsh'
 
 ;--------------------------------
 ;General
@@ -263,9 +273,22 @@ Section "Install Java SE Runtime Environment" INSTALLJAVA
       RETURN
     ${EndIf}
   NoJava:
-    MessageBox MB_OK|MB_ICONINFORMATION "Installer will now install Java SE Runtime Environment"
+    MessageBox MB_OK|MB_ICONINFORMATION "Installer will now install Java SE Runtime Environment. This will require Administrator privileges."
     File "${TBBSOURCE}\Browser\JonDo\jre.exe"
-    ExecWait "$INSTDIR\Browser\JonDo\jre.exe"
+    Sleep 1000
+    ${StdUtils.ExecShellWaitEx} $0 $1 "$INSTDIR\Browser\JonDo\jre.exe" "open" "" ;try to launch the process
+    StrCmp $0 "error" ExecFailed ;check if process failed to create
+    StrCmp $0 "no_wait" WaitNotPossible ;check if process can be waited for - always check this!
+    StrCmp $0 "ok" WaitForProc ;make sure process was created successfully
+    Abort
+    WaitForProc:
+    ${StdUtils.WaitForProcEx} $2 $1
+    Goto WaitDone
+    ExecFailed:
+    Goto WaitDone
+    WaitNotPossible:
+    Goto WaitDone
+    WaitDone:
     RETURN
 SectionEnd
 
