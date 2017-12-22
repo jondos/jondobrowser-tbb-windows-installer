@@ -34,7 +34,7 @@
   SetCompressorDictSize 32
 
   ;Request application privileges for Windows Vista
-  RequestExecutionLevel admin
+  RequestExecutionLevel user
 
 ;--------------------------------
 ;Interface Configuration
